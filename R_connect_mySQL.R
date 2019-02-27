@@ -1,8 +1,12 @@
+setwd("E:/Doctoral/ProjectReviews")
+
 # library(RMariaDB)
 library(RMySQL)
+library(ggplot2)
+library(reshape2)
 
 db_user <- 'root'
-db_password <- 'XXXX4869'
+db_password <- 'aptx4869'
 db_name <- 'wtest'
 db_table <- 'yelp_user'
 db_host <- '127.0.0.1' # for local access
@@ -27,6 +31,8 @@ mydata = fetch(rs, n=-1)
 reviews_per_user <- mydata[,2]
 
 hist(reviews_per_user[reviews_per_user<100], breaks = 50)
+hist(reviews_per_user[reviews_per_user<100 & reviews_per_user>1], breaks = 50)
+length(reviews_per_user[reviews_per_user>1])
 
 rs = dbSendQuery(mydb, "SELECT review_count FROM wtest.yelp_user")
 
@@ -36,11 +42,32 @@ reviews_per_user_original = as.numeric(mydata2[['review_count']])
 
 hist(reviews_per_user_original[reviews_per_user_original<100], breaks = 50)
 
+hist(reviews_per_user_original[reviews_per_user_original<100 & reviews_per_user_original>1], breaks = 50)
+length(reviews_per_user_original[reviews_per_user_original>1])
+
+rs = dbSendQuery(mydb, "select year(yelping_since) as start_year, 
+       count(user_id) as users_count
+                 from yelp_user
+                 group by start_year
+                 order by start_year asc")
+
+mydata3 = fetch(rs, n=-1)
+
+ggplot(data=mydata3, aes(x=start_year, y=users_count)) +
+  geom_bar(stat="identity", fill = "#999999") +
+  ggtitle("users entry per year") + theme(plot.title = element_text(hjust = 0.5))
+
 # on.exit(dbDisconnect(mydb))
 
 mean(reviews_per_user)
 mean(reviews_per_user_original)
 sum(reviews_per_user)
+mean(reviews_per_user[reviews_per_user>1])
+hist(reviews_per_user, breaks = 50)
+hist(reviews_per_user_original[reviews_per_user_original>100], breaks = 50)
+sum(reviews_per_user>=50)
+sum(reviews_per_user>100)
+length(reviews_per_user)
 
 #######################################################################################################
 ###------------------------------------each year elites------------------------------------------------
@@ -58,6 +85,7 @@ for (y in 2005:2017){
   year_current_elite_vec <- c(year_current_elite_vec, as.numeric(mydata_current))}
 
 year_current_elite_vec
+mean(year_current_elite_vec)
 
 ###
 year_join_elite_vec <- c()
@@ -75,6 +103,7 @@ for (y in 2006:2017){
 
 year_join_elite_vec <- c(0, year_join_elite_vec)
 year_join_elite_vec
+mean(year_join_elite_vec)
 
 ###
 year_exit_elite_vec <- c()
@@ -92,13 +121,11 @@ for (y in 2005:2016){
 
 year_exit_elite_vec <- c(year_exit_elite_vec, 0)
 year_exit_elite_vec
+mean(year_exit_elite_vec)
 
 ###--------------------------------plots--------------------------------------------
 # save.image(file='variation_elites.RData')
 # load('variation_elites.RData')
-
-library(ggplot2)
-library(reshape2)
 
 df <- data.frame(year=seq(2005, 2017, 1),
                  year_join_elite_vec,
@@ -137,7 +164,7 @@ for (y in 2006:2016){
   year_last <- paste0("year_",year-1)
   year_next <- paste0("year_",year+1)
   
-  rs = dbSendQuery(mydb, paste0("SELECT count(*) from wtest.yelp_user 
+  rs = dbSendQuery(mydb, paste0("SELECT count(*) from wtest.yelp_user
                                 where IFNULL(",year_last,", 0) =0 and IFNULL(",year_current,", 0) =1 and IFNULL(",year_next,", 0) =1"))
   
   mydata_NYY = fetch(rs, n=-1)
@@ -145,7 +172,7 @@ for (y in 2006:2016){
 
 year_N_Y_Y_elite_vec <- c(0, year_N_Y_Y_elite_vec)
 year_N_Y_Y_elite_vec <- c(year_N_Y_Y_elite_vec,0)
-year_N_Y_Y_elite_vec
+mean(year_N_Y_Y_elite_vec)
 
 df_NYY <- data.frame(year=seq(2005, 2017, 1),
                  year_N_Y_Y_elite_vec)
@@ -172,6 +199,7 @@ for (y in 2006:2016){
 year_Y_N_Y_elite_vec <- c(0, year_Y_N_Y_elite_vec)
 year_Y_N_Y_elite_vec <- c(year_Y_N_Y_elite_vec,0)
 year_Y_N_Y_elite_vec
+mean(year_Y_N_Y_elite_vec)
 
 df_YNY <- data.frame(year=seq(2005, 2017, 1),
                      year_Y_N_Y_elite_vec)
