@@ -317,8 +317,8 @@ ggplot(data=avg_review_length_yearly, aes(x=year, y=text_length)) +
   geom_bar(stat="identity",fill = "#56B4E9") +
   ggtitle("all users average review length by year") + theme(plot.title = element_text(hjust = 0.5))
 
-save.image(file='review_numbers_length.RData')
-# load('review_numbers_length.RData')
+# save.image(file='review_numbers_length.RData')
+load('review_numbers_length.RData')
 
 ##################################################################################
 ################################# text length ####################################

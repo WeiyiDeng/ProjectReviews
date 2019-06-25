@@ -12,7 +12,7 @@ group by member,band, week);
 
 # export
 SELECT *
-FROM music_sample.sum_SI_mat
+FROM music_sample.sum_SI_matsum_si_mat
 INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/dummy_SI_mat.csv'
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
