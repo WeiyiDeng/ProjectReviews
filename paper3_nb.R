@@ -50,4 +50,15 @@ pchisq(2 * (logLik(m_nb) - logLik(m_poi)), df = 1, lower.tail = FALSE)
 summary(m_tobit <- vglm(DV ~ .-DV, tobit(Upper = 800), data = paper3_lags))
 # summary(m_tobit <- vglm(DV ~ .-DV-DV_lag1, tobit(Upper = 800), data = paper3_lags))
 
+############################################################################################
+paper3_X_std <- read.csv("X_std_paper3_Nov.csv",header = FALSE)
+paper3_y <- read.csv("y_paper3_Nov.csv",header = FALSE)
 
+m_poi <- glm(paper3_y$V1 ~ paper3_X_std$V1+paper3_X_std$V2+paper3_X_std$V3+paper3_X_std$V4+paper3_X_std$V5, family = "poisson")
+summary(m_poi)
+
+summary(m1 <- glm.nb(paper3_y$V1 ~ paper3_X_std$V1+paper3_X_std$V2+paper3_X_std$V3+paper3_X_std$V4+paper3_X_std$V5))
+# errors in nb model
+
+pchisq(2 * (logLik(m1) - logLik(m_poi)), df = 1, lower.tail = FALSE)
+        
